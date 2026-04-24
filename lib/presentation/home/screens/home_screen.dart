@@ -324,7 +324,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(state.message),
-          action: SnackBarAction(label: 'Retry', onPressed: () {}),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: _showSourcePicker,
+          ),
         ),
       );
     }
