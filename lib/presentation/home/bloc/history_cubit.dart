@@ -2,7 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_snap/core/errors/failures.dart';
 import 'package:food_snap/domain/usecases/get_all_records.dart';
 import 'package:food_snap/presentation/home/bloc/history_state.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class HistoryCubit extends Cubit<HistoryState> {
   final GetAllRecords getAllRecords;
 
