@@ -39,25 +39,39 @@ class FoodHistoryTile extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.file(
-                File(record.imageUri),
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkSurface2 : AppColors.lightPrimaryBg,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.restaurant_rounded,
-                    size: 28,
-                    color: textMuted,
-                  ),
-                ),
-              ),
+              child: record.imageUri.isNotEmpty
+                  ? Image.file(
+                      File(record.imageUri),
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.darkSurface2 : AppColors.lightPrimaryBg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.restaurant_rounded,
+                          size: 28,
+                          color: textMuted,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkSurface2 : AppColors.lightPrimaryBg,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.restaurant_rounded,
+                        size: 28,
+                        color: textMuted,
+                      ),
+                    ),
             ),
             const SizedBox(width: 14),
             Expanded(
