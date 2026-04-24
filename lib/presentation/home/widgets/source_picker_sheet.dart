@@ -7,57 +7,63 @@ void showSourcePickerSheet(
   BuildContext context,
   void Function(ImageSource) onSourceSelected,
 ) {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-  final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-  final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-  final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-  final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-
   showModalBottomSheet(
     context: context,
-    backgroundColor: surface,
+    backgroundColor: Colors.transparent,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (ctx) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select source',
-              style: AppTextStyles.h3.copyWith(color: textColor),
+    builder: (ctx) {
+      final isDark = Theme.of(ctx).brightness == Brightness.dark;
+      final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+      final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+      final textColor = isDark ? AppColors.darkText : AppColors.lightText;
+      final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
+      return Material(
+        color: surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Select source',
+                  style: AppTextStyles.h3.copyWith(color: textColor),
+                ),
+                const SizedBox(height: 16),
+                _SourceOption(
+                  icon: Icons.camera_alt_outlined,
+                  label: 'Camera',
+                  primary: primary,
+                  textColor: textColor,
+                  border: border,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onSourceSelected(ImageSource.camera);
+                  },
+                ),
+                const SizedBox(height: 12),
+                _SourceOption(
+                  icon: Icons.photo_library_outlined,
+                  label: 'Photo Library',
+                  primary: primary,
+                  textColor: textColor,
+                  border: border,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onSourceSelected(ImageSource.gallery);
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            _SourceOption(
-              icon: Icons.camera_alt_outlined,
-              label: 'Camera',
-              primary: primary,
-              textColor: textColor,
-              border: border,
-              onTap: () {
-                Navigator.pop(ctx);
-                onSourceSelected(ImageSource.camera);
-              },
-            ),
-            const SizedBox(height: 12),
-            _SourceOption(
-              icon: Icons.photo_library_outlined,
-              label: 'Photo Library',
-              primary: primary,
-              textColor: textColor,
-              border: border,
-              onTap: () {
-                Navigator.pop(ctx);
-                onSourceSelected(ImageSource.gallery);
-              },
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
+      );
+    },
   );
 }
 
