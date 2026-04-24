@@ -104,17 +104,20 @@ class _HistoryContent extends StatelessWidget {
     }
 
     final records = (state as HistoryLoaded).records;
-    return Column(
-      children: [
-        for (final record in records)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: FoodHistoryTile(
-              record: record,
-              onTap: () => onTap(record),
-            ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: records.length,
+      itemBuilder: (context, index) {
+        final record = records[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: FoodHistoryTile(
+            record: record,
+            onTap: () => onTap(record),
           ),
-      ],
+        );
+      },
     );
   }
 }
