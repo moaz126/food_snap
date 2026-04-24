@@ -9,8 +9,10 @@ import 'package:food_snap/data/database/database_helper.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 import 'package:food_snap/domain/repositories/food_repository.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
+@LazySingleton(as: FoodRepository)
 class FoodRepositoryImpl implements FoodRepository {
   final DatabaseHelper databaseHelper;
 
@@ -33,8 +35,10 @@ class FoodRepositoryImpl implements FoodRepository {
         id: const Uuid().v4(),
         imageUri: imageFile.path,
         detectedFoodName: (parsed['detectedFoodName'] ?? 'Unknown') as String,
-        cuisineTags: List<String>.from(parsed['cuisineTags'] as List<dynamic>? ?? <String>[]),
-        confidencePercent: (parsed['confidencePercent'] as num?)?.toDouble() ?? 0,
+        cuisineTags: List<String>.from(
+            parsed['cuisineTags'] as List<dynamic>? ?? <String>[]),
+        confidencePercent:
+            (parsed['confidencePercent'] as num?)?.toDouble() ?? 0,
         nutrition: NutritionInfo(
           calories: (nutritionJson['calories'] as num?)?.toDouble() ?? 0,
           protein: (nutritionJson['protein'] as num?)?.toDouble() ?? 0,
@@ -128,7 +132,8 @@ class FoodRepositoryImpl implements FoodRepository {
 
     final text = (content.first as Map<String, dynamic>)['text'];
     if (text is! String || text.trim().isEmpty) {
-      throw const InvalidApiResponseFailure(message: 'Invalid API text payload');
+      throw const InvalidApiResponseFailure(
+          message: 'Invalid API text payload');
     }
 
     return text;
@@ -136,17 +141,17 @@ class FoodRepositoryImpl implements FoodRepository {
 
   Map<String, dynamic> _parseAnthropicResponse(String responseText) {
     try {
-      final clean = responseText
-          .replaceAll('```json', '')
-          .replaceAll('```', '')
-          .trim();
+      final clean =
+          responseText.replaceAll('```json', '').replaceAll('```', '').trim();
       final jsonMap = jsonDecode(clean) as Map<String, dynamic>;
       if (!jsonMap.containsKey('nutrition')) {
-        throw const InvalidApiResponseFailure(message: 'Missing nutrition data');
+        throw const InvalidApiResponseFailure(
+            message: 'Missing nutrition data');
       }
       return jsonMap;
     } on FormatException catch (e) {
-      throw InvalidApiResponseFailure(message: 'JSON parse failed: ${e.message}');
+      throw InvalidApiResponseFailure(
+          message: 'JSON parse failed: ${e.message}');
     }
   }
 

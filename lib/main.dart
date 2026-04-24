@@ -11,7 +11,7 @@ import 'package:food_snap/presentation/result_detail/bloc/food_analysis_bloc.dar
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  await initDependencies();
+  await configureDependencies();
   runApp(const FoodSnapApp());
 }
 
@@ -22,7 +22,7 @@ class FoodSnapApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => sl<ThemeCubit>()),
         BlocProvider(create: (_) => sl<FoodAnalysisBloc>()),
         BlocProvider(create: (_) => sl<HistoryCubit>()),
       ],

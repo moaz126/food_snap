@@ -3,11 +3,14 @@ import 'package:food_snap/core/errors/failures.dart';
 import 'package:food_snap/domain/usecases/analyze_food.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_event.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_state.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
   final AnalyzeFood analyzeFood;
 
-  FoodAnalysisBloc({required this.analyzeFood}) : super(const FoodAnalysisInitial()) {
+  FoodAnalysisBloc({required this.analyzeFood})
+      : super(const FoodAnalysisInitial()) {
     on<AnalyzeFoodEvent>(_onAnalyzeFood);
     on<ResetFoodAnalysisEvent>(_onReset);
   }

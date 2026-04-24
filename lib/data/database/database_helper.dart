@@ -2,9 +2,11 @@ import 'package:food_snap/core/constants/app_constants.dart';
 import 'package:food_snap/core/errors/failures.dart';
 import 'package:food_snap/data/models/food_record_model.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
+import 'package:injectable/injectable.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+@singleton
 class DatabaseHelper {
   Database? _db;
 
