@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
 import 'package:food_snap/core/navigation/app_router.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 import 'package:food_snap/presentation/home/bloc/history_cubit.dart';
 import 'package:food_snap/presentation/home/widgets/analyze_section.dart';
@@ -339,11 +339,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-    final primaryBg =
-        isDark ? AppColors.darkPrimaryBg : AppColors.lightPrimaryBg;
+    final palette = context.appPalette;
+    final textColor = palette.text;
+    final primary = palette.primary;
+    final primaryBg = palette.primaryBg;
     final count = mockRecords.length;
 
     return BlocListener<FoodAnalysisBloc, FoodAnalysisState>(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 
 class AppTheme {
   AppTheme._();
@@ -20,6 +21,9 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: scheme,
+      extensions: const <ThemeExtension<dynamic>>[
+        AppPalette.light,
+      ],
       scaffoldBackgroundColor: AppColors.lightBackground,
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.lightSurface,
@@ -66,6 +70,9 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: scheme,
+      extensions: const <ThemeExtension<dynamic>>[
+        AppPalette.dark,
+      ],
       scaffoldBackgroundColor: AppColors.darkBackground,
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkSurface,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 import 'package:food_snap/presentation/home/bloc/history_cubit.dart';
 import 'package:food_snap/presentation/home/bloc/history_state.dart';
@@ -15,11 +15,10 @@ class RecentScansSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final primaryBg =
-        isDark ? AppColors.darkPrimaryBg : AppColors.lightPrimaryBg;
+    final palette = context.appPalette;
+    final primary = palette.primary;
+    final textColor = palette.text;
+    final primaryBg = palette.primaryBg;
 
     return BlocBuilder<HistoryCubit, HistoryState>(
       builder: (context, state) {
@@ -70,8 +69,7 @@ class _HistoryContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSub = isDark ? AppColors.darkTextSub : AppColors.lightTextSub;
+    final textSub = context.appPalette.textSub;
 
     if (state is HistoryLoading) {
       return const Center(
