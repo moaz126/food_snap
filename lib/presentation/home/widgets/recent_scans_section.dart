@@ -90,7 +90,7 @@ class _HistoryContent extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextButton(
-            onPressed: () => context.read<HistoryCubit>().load(),
+            onPressed: () => context.read<HistoryCubit>().loadHistory(),
             child: const Text('Retry'),
           ),
         ],

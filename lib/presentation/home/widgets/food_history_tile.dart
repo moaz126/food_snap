@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
 import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/core/utils/date_formatter.dart';
+import 'package:food_snap/core/utils/image_storage_service.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 
 class FoodHistoryTile extends StatelessWidget {
@@ -37,41 +38,26 @@ class FoodHistoryTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: record.imageUri.isNotEmpty
-                  ? Image.file(
+            FutureBuilder<bool>(
+              future: ImageStorageService.imageExists(record.imageUri),
+              builder: (context, snapshot) {
+                final exists = snapshot.data ?? false;
+
+                if (exists && record.imageUri.isNotEmpty) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
                       File(record.imageUri),
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: palette.surface2,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.restaurant_rounded,
-                          size: 28,
-                          color: textMuted,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: palette.surface2,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.restaurant_rounded,
-                        size: 28,
-                        color: textMuted,
-                      ),
+                      errorBuilder: (_, __, ___) => _buildPlaceholder(context),
                     ),
+                  );
+                }
+
+                return _buildPlaceholder(context);
+              },
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -113,6 +99,24 @@ class FoodHistoryTile extends StatelessWidget {
             Icon(Icons.chevron_right_rounded, color: textMuted, size: 22),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(BuildContext context) {
+    final palette = context.appPalette;
+
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: palette.primaryBg,
+      ),
+      child: Icon(
+        Icons.restaurant,
+        color: palette.primary,
+        size: 24,
       ),
     );
   }

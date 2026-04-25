@@ -14,6 +14,7 @@ import 'package:food_snap/data/database/database_helper.dart' as _i110;
 import 'package:food_snap/data/repositories/food_repository_impl.dart' as _i79;
 import 'package:food_snap/domain/repositories/food_repository.dart' as _i535;
 import 'package:food_snap/domain/usecases/analyze_food.dart' as _i1015;
+import 'package:food_snap/domain/usecases/delete_record.dart' as _i763;
 import 'package:food_snap/domain/usecases/get_all_records.dart' as _i257;
 import 'package:food_snap/domain/usecases/get_record_by_id.dart' as _i956;
 import 'package:food_snap/presentation/home/bloc/history_cubit.dart' as _i532;
@@ -37,6 +38,8 @@ _i174.GetIt initGetIt(
   gh.singleton<_i110.DatabaseHelper>(() => _i110.DatabaseHelper());
   gh.lazySingleton<_i535.FoodRepository>(() =>
       _i79.FoodRepositoryImpl(databaseHelper: gh<_i110.DatabaseHelper>()));
+  gh.lazySingleton<_i763.DeleteRecord>(
+      () => _i763.DeleteRecord(gh<_i535.FoodRepository>()));
   gh.lazySingleton<_i1015.AnalyzeFood>(
       () => _i1015.AnalyzeFood(gh<_i535.FoodRepository>()));
   gh.lazySingleton<_i257.GetAllRecords>(

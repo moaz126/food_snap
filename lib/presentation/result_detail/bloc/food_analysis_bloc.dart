@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:food_snap/data/ai/ai_provider.dart';
 import 'package:food_snap/core/errors/failures.dart';
 import 'package:food_snap/domain/usecases/analyze_food.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_event.dart';
@@ -10,10 +10,11 @@ import 'package:injectable/injectable.dart';
 
 @injectable
 class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
-  final AnalyzeFood analyzeFood;
+  final AnalyzeFood _analyzeFood;
 
-  FoodAnalysisBloc({required this.analyzeFood})
-      : super(const FoodAnalysisInitial()) {
+  FoodAnalysisBloc({required AnalyzeFood analyzeFood})
+      : _analyzeFood = analyzeFood,
+        super(const FoodAnalysisInitial()) {
     on<AnalyzeFoodEvent>(_onAnalyzeFood);
     on<ResetAnalysisEvent>(_onReset);
   }
@@ -22,45 +23,31 @@ class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
     AnalyzeFoodEvent event,
     Emitter<FoodAnalysisState> emit,
   ) async {
+    // Guard: ignore concurrent requests
+    if (state is FoodAnalysisLoading) return;
+
     emit(const FoodAnalysisLoading());
+
     try {
-      final record = await analyzeFood(event.imageFile);
+      final record = await _analyzeFood(event.imageFile);
       emit(FoodAnalysisSuccess(record));
-    } on SocketException catch (_) {
-      emit(
-        const FoodAnalysisError(
-          message: 'No internet connection. Check your network and try again.',
-          errorType: FoodAnalysisErrorType.noInternet,
-        ),
-      );
-    } on TimeoutException catch (_) {
-      emit(
-        const FoodAnalysisError(
-          message: 'Analysis timed out. Please try again.',
-          errorType: FoodAnalysisErrorType.timeout,
-        ),
-      );
-    } on FormatException catch (_) {
-      emit(
-        const FoodAnalysisError(
-          message: 'Could not analyze this image. Try a clearer photo.',
-          errorType: FoodAnalysisErrorType.invalidResponse,
-        ),
-      );
-    } on Failure catch (f) {
-      emit(
-        FoodAnalysisError(
-          message: f.message,
-          errorType: FoodAnalysisErrorType.imageProcessing,
-        ),
-      );
+    } on AiProviderException catch (e) {
+      emit(FoodAnalysisError(
+        message: e.message,
+        errorType: _mapErrorType(e.type),
+      ));
+    } on DatabaseException catch (e) {
+      // DB failure that escaped the repository (shouldn't happen
+      // since analyzeFood swallows DB errors, but handle defensively)
+      emit(FoodAnalysisError(
+        message: e.message,
+        errorType: FoodAnalysisErrorType.unknown,
+      ));
     } catch (e) {
-      emit(
-        const FoodAnalysisError(
-          message: 'Something went wrong. Please try again.',
-          errorType: FoodAnalysisErrorType.unknown,
-        ),
-      );
+      emit(const FoodAnalysisError(
+        message: 'Something went wrong. Please try again.',
+        errorType: FoodAnalysisErrorType.unknown,
+      ));
     }
   }
 
@@ -69,5 +56,20 @@ class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
     Emitter<FoodAnalysisState> emit,
   ) {
     emit(const FoodAnalysisInitial());
+  }
+
+  FoodAnalysisErrorType _mapErrorType(AiProviderErrorType type) {
+    return switch (type) {
+      AiProviderErrorType.noInternet => FoodAnalysisErrorType.noInternet,
+      AiProviderErrorType.timeout => FoodAnalysisErrorType.timeout,
+      AiProviderErrorType.invalidResponse =>
+        FoodAnalysisErrorType.invalidResponse,
+      AiProviderErrorType.imageProcessing =>
+        FoodAnalysisErrorType.imageProcessing,
+      AiProviderErrorType.rateLimitExceeded ||
+      AiProviderErrorType.unauthorized ||
+      AiProviderErrorType.unknown =>
+        FoodAnalysisErrorType.unknown,
+    };
   }
 }

@@ -1,4 +1,4 @@
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 enum PermissionResult {
   granted,
@@ -12,7 +12,7 @@ class PermissionHandlerHelper {
   /// Returns [PermissionResult.permanentlyDenied] if permission is permanently denied
   /// Returns [PermissionResult.denied] if permission is denied but not permanently
   static Future<PermissionResult> requestCamera() async {
-    final status = await Permission.camera.request();
+    final status = await ph.Permission.camera.request();
 
     if (status.isGranted) {
       return PermissionResult.granted;
@@ -28,9 +28,9 @@ class PermissionHandlerHelper {
   /// Returns [PermissionResult.permanentlyDenied] if permission is permanently denied
   /// Returns [PermissionResult.denied] if permission is denied but not permanently
   static Future<PermissionResult> requestPhotos() async {
-    final status = await Permission.photos.request();
+    final status = await ph.Permission.photos.request();
 
-    if (status.isGranted) {
+    if (status.isGranted || status.isLimited) {
       return PermissionResult.granted;
     } else if (status.isPermanentlyDenied) {
       return PermissionResult.permanentlyDenied;
@@ -41,6 +41,6 @@ class PermissionHandlerHelper {
 
   /// Open app settings
   static Future<bool> openAppSettings() async {
-    return openAppSettings();
+    return ph.openAppSettings();
   }
 }
