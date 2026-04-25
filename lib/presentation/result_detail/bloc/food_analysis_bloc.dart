@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_snap/core/errors/failures.dart';
 import 'package:food_snap/domain/usecases/analyze_food.dart';
@@ -12,7 +15,7 @@ class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
   FoodAnalysisBloc({required this.analyzeFood})
       : super(const FoodAnalysisInitial()) {
     on<AnalyzeFoodEvent>(_onAnalyzeFood);
-    on<ResetFoodAnalysisEvent>(_onReset);
+    on<ResetAnalysisEvent>(_onReset);
   }
 
   Future<void> _onAnalyzeFood(
@@ -22,16 +25,47 @@ class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
     emit(const FoodAnalysisLoading());
     try {
       final record = await analyzeFood(event.imageFile);
-      emit(FoodAnalysisSuccess(record: record));
+      emit(FoodAnalysisSuccess(record));
+    } on SocketException catch (_) {
+      emit(
+        const FoodAnalysisError(
+          message: 'No internet connection. Check your network and try again.',
+          errorType: FoodAnalysisErrorType.noInternet,
+        ),
+      );
+    } on TimeoutException catch (_) {
+      emit(
+        const FoodAnalysisError(
+          message: 'Analysis timed out. Please try again.',
+          errorType: FoodAnalysisErrorType.timeout,
+        ),
+      );
+    } on FormatException catch (_) {
+      emit(
+        const FoodAnalysisError(
+          message: 'Could not analyze this image. Try a clearer photo.',
+          errorType: FoodAnalysisErrorType.invalidResponse,
+        ),
+      );
     } on Failure catch (f) {
-      emit(FoodAnalysisError(message: f.message));
+      emit(
+        FoodAnalysisError(
+          message: f.message,
+          errorType: FoodAnalysisErrorType.imageProcessing,
+        ),
+      );
     } catch (e) {
-      emit(FoodAnalysisError(message: 'Failed to analyze food: $e'));
+      emit(
+        const FoodAnalysisError(
+          message: 'Something went wrong. Please try again.',
+          errorType: FoodAnalysisErrorType.unknown,
+        ),
+      );
     }
   }
 
   void _onReset(
-    ResetFoodAnalysisEvent event,
+    ResetAnalysisEvent event,
     Emitter<FoodAnalysisState> emit,
   ) {
     emit(const FoodAnalysisInitial());

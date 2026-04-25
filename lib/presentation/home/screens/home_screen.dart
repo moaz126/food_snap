@@ -5,18 +5,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
 import 'package:food_snap/core/navigation/app_router.dart';
 import 'package:food_snap/core/theme/app_palette.dart';
+import 'package:food_snap/core/utils/image_picker_service.dart';
+import 'package:food_snap/core/utils/permission_handler_helper.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 import 'package:food_snap/presentation/home/bloc/history_cubit.dart';
-import 'package:food_snap/presentation/home/widgets/analyze_section.dart';
 import 'package:food_snap/presentation/home/widgets/empty_history_state.dart';
 import 'package:food_snap/presentation/home/widgets/food_history_tile.dart';
 import 'package:food_snap/presentation/home/widgets/home_app_bar.dart';
-import 'package:food_snap/presentation/home/widgets/source_picker_sheet.dart';
+import 'package:food_snap/presentation/home/widgets/upload_zone_card.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_bloc.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_event.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,314 +28,189 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // TODO: Remove mock data — replace with BlocBuilder
-  // when UI testing is complete
-  final List<FoodRecord> mockRecords = [
-    FoodRecord(
-      id: '1',
-      imageUri: '',
-      detectedFoodName: 'Margherita Pizza',
-      cuisineTags: ['Italian', 'Vegetarian'],
-      confidencePercent: 94.0,
-      nutrition: NutritionInfo(
-        calories: 285,
-        protein: 9,
-        carbs: 36,
-        fat: 10,
-        fiber: 2,
-        sugar: 4,
-        sodium: 520,
-        servingSize: '1 slice',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
-    ),
-    FoodRecord(
-      id: '2',
-      imageUri: '',
-      detectedFoodName: 'Caesar Salad',
-      cuisineTags: ['American'],
-      confidencePercent: 88.0,
-      nutrition: NutritionInfo(
-        calories: 180,
-        protein: 6,
-        carbs: 14,
-        fat: 12,
-        fiber: 3,
-        sugar: 2,
-        sodium: 380,
-        servingSize: '1 bowl',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    FoodRecord(
-      id: '3',
-      imageUri: '',
-      detectedFoodName: 'Chicken Biryani',
-      cuisineTags: ['Pakistani', 'South Asian'],
-      confidencePercent: 96.0,
-      nutrition: NutritionInfo(
-        calories: 490,
-        protein: 28,
-        carbs: 58,
-        fat: 14,
-        fiber: 4,
-        sugar: 3,
-        sodium: 720,
-        servingSize: '1 plate',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-    ),
-    FoodRecord(
-      id: '4',
-      imageUri: '',
-      detectedFoodName: 'Banana',
-      cuisineTags: ['Fruit'],
-      confidencePercent: 99.0,
-      nutrition: NutritionInfo(
-        calories: 89,
-        protein: 1,
-        carbs: 23,
-        fat: 0,
-        fiber: 3,
-        sugar: 12,
-        sodium: 1,
-        servingSize: '1 medium',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(hours: 8)),
-    ),
-    FoodRecord(
-      id: '5',
-      imageUri: '',
-      detectedFoodName: 'Avocado Toast',
-      cuisineTags: ['American', 'Healthy'],
-      confidencePercent: 91.0,
-      nutrition: NutritionInfo(
-        calories: 320,
-        protein: 8,
-        carbs: 30,
-        fat: 18,
-        fiber: 7,
-        sugar: 2,
-        sodium: 420,
-        servingSize: '2 slices',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    FoodRecord(
-      id: '6',
-      imageUri: '',
-      detectedFoodName: 'Chocolate Brownie',
-      cuisineTags: ['Dessert', 'American'],
-      confidencePercent: 87.0,
-      nutrition: NutritionInfo(
-        calories: 410,
-        protein: 5,
-        carbs: 52,
-        fat: 20,
-        fiber: 2,
-        sugar: 38,
-        sodium: 180,
-        servingSize: '1 piece',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    FoodRecord(
-      id: '7',
-      imageUri: '',
-      detectedFoodName: 'Green Smoothie',
-      cuisineTags: ['Healthy', 'Vegan'],
-      confidencePercent: 82.0,
-      nutrition: NutritionInfo(
-        calories: 145,
-        protein: 4,
-        carbs: 28,
-        fat: 2,
-        fiber: 5,
-        sugar: 18,
-        sodium: 90,
-        servingSize: '1 glass',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    FoodRecord(
-      id: '8',
-      imageUri: '',
-      detectedFoodName: 'Beef Burger',
-      cuisineTags: ['American', 'Fast Food'],
-      confidencePercent: 93.0,
-      nutrition: NutritionInfo(
-        calories: 650,
-        protein: 35,
-        carbs: 48,
-        fat: 32,
-        fiber: 2,
-        sugar: 8,
-        sodium: 980,
-        servingSize: '1 burger',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    FoodRecord(
-      id: '9',
-      imageUri: '',
-      detectedFoodName: 'Dal Chawal',
-      cuisineTags: ['Pakistani', 'Vegetarian'],
-      confidencePercent: 90.0,
-      nutrition: NutritionInfo(
-        calories: 380,
-        protein: 14,
-        carbs: 65,
-        fat: 6,
-        fiber: 8,
-        sugar: 3,
-        sodium: 540,
-        servingSize: '1 plate',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    FoodRecord(
-      id: '10',
-      imageUri: '',
-      detectedFoodName: 'Strawberry Cheesecake',
-      cuisineTags: ['Dessert', 'American'],
-      confidencePercent: 85.0,
-      nutrition: NutritionInfo(
-        calories: 520,
-        protein: 8,
-        carbs: 45,
-        fat: 34,
-        fiber: 1,
-        sugar: 36,
-        sodium: 290,
-        servingSize: '1 slice',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    FoodRecord(
-      id: '11',
-      imageUri: '',
-      detectedFoodName: 'Chicken Karahi',
-      cuisineTags: ['Pakistani'],
-      confidencePercent: 95.0,
-      nutrition: NutritionInfo(
-        calories: 420,
-        protein: 32,
-        carbs: 12,
-        fat: 26,
-        fiber: 2,
-        sugar: 4,
-        sodium: 680,
-        servingSize: '1 serving',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    FoodRecord(
-      id: '12',
-      imageUri: '',
-      detectedFoodName: 'Mango',
-      cuisineTags: ['Fruit', 'Pakistani'],
-      confidencePercent: 98.0,
-      nutrition: NutritionInfo(
-        calories: 99,
-        protein: 1,
-        carbs: 25,
-        fat: 0,
-        fiber: 3,
-        sugar: 23,
-        sodium: 2,
-        servingSize: '1 medium',
-      ),
-      rawApiSummary: '',
-      createdAt: DateTime.now().subtract(const Duration(days: 4)),
-    ),
-  ];
-
-  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
   late final ScrollController _scrollController;
+  late final ImagePickerService _imagePickerService;
   bool _showFab = false;
+
+  // Mock data for UI testing
+  final List<FoodRecord> mockRecords = [];
+
+  bool get _canAnalyze => _selectedImage != null;
 
   @override
   void initState() {
     super.initState();
+    _imagePickerService = ImagePickerService();
     context.read<HistoryCubit>().load();
     _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !_showFab) {
-        setState(() => _showFab = true);
-      } else if (_scrollController.offset <= 300 && _showFab) {
-        setState(() => _showFab = false);
-      }
-    });
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickAndAnalyze(ImageSource source) async {
-    try {
-      final picked = await _picker.pickImage(
-        source: source,
-        imageQuality: 85,
-        maxWidth: 1024,
-        maxHeight: 1024,
-      );
-
-      if (picked == null || !mounted) return;
-
-      context.read<FoodAnalysisBloc>().add(
-            AnalyzeFoodEvent(imageFile: File(picked.path)),
-          );
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Permission denied or failed to pick image'),
-          action: SnackBarAction(
-            label: 'Retry',
-            onPressed: () => _pickAndAnalyze(source),
-          ),
-        ),
-      );
+  void _onScroll() {
+    if (_scrollController.offset > 300 && !_showFab) {
+      setState(() => _showFab = true);
+    } else if (_scrollController.offset <= 300 && _showFab) {
+      setState(() => _showFab = false);
     }
   }
 
-  void _showSourcePicker() {
-    showSourcePickerSheet(context, _pickAndAnalyze);
+  Future<void> _handleImageSource(ImageSource source) async {
+    final permission = source == ImageSource.camera
+        ? PermissionHandlerHelper.requestCamera
+        : PermissionHandlerHelper.requestPhotos;
+
+    final status = await permission();
+
+    if (!mounted) return;
+
+    if (status == PermissionResult.granted) {
+      await _pickImage(source);
+    } else if (status == PermissionResult.permanentlyDenied) {
+      _showPermissionDialog(source);
+    } else {
+      _showPermissionSnackbar(source);
+    }
+  }
+
+  void _showPermissionDialog(ImageSource source) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Permission Required'),
+        content: Text(
+          source == ImageSource.camera
+              ? 'Camera access is required to take food photos. '
+                  'Please enable it in Settings.'
+              : 'Photo library access is required to select '
+                  'food images. Please enable it in Settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPermissionSnackbar(ImageSource source) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          source == ImageSource.camera
+              ? 'Camera permission is needed to take photos'
+              : 'Photo library permission is needed',
+        ),
+        action: SnackBarAction(
+          label: 'Allow',
+          onPressed: () => _handleImageSource(source),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final image = source == ImageSource.camera
+          ? await _imagePickerService.pickFromCamera()
+          : await _imagePickerService.pickFromGallery();
+
+      if (image != null && mounted) {
+        setState(() => _selectedImage = image);
+      } else if (!mounted) {
+        return;
+      }
+    } catch (_) {
+      _showErrorSnackbar('Failed to load image. Try again.');
+    }
+  }
+
+  void _removeImage() {
+    setState(() => _selectedImage = null);
+    context.read<FoodAnalysisBloc>().add(const ResetAnalysisEvent());
+  }
+
+  void _onAnalyzeTap() {
+    if (_selectedImage == null) return;
+    context.read<FoodAnalysisBloc>().add(AnalyzeFoodEvent(_selectedImage!));
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _showErrorWithRetry(FoodAnalysisError state) {
+    String message;
+    switch (state.errorType) {
+      case FoodAnalysisErrorType.noInternet:
+        message = 'No internet connection. '
+            'Check your network and try again.';
+        break;
+      case FoodAnalysisErrorType.timeout:
+        message = 'Analysis timed out. Please try again.';
+        break;
+      case FoodAnalysisErrorType.invalidResponse:
+        message = 'Could not analyze this image. '
+            'Try a clearer photo.';
+        break;
+      case FoodAnalysisErrorType.imageProcessing:
+        message = 'Image processing failed. '
+            'Try another photo.';
+        break;
+      case FoodAnalysisErrorType.unknown:
+        message = 'Something went wrong. Please try again.';
+        break;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'Retry',
+          onPressed: _onAnalyzeTap,
+        ),
+      ),
+    );
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
+    );
   }
 
   void _openResult(FoodRecord record) {
     context.pushNamed(AppRoutes.result, extra: record);
   }
 
-  void _onAnalysisStateChanged(BuildContext context, FoodAnalysisState state) {
-    if (state is FoodAnalysisError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.message),
-          action: SnackBarAction(
-            label: 'Retry',
-            onPressed: _showSourcePicker,
-          ),
-        ),
-      );
-    }
+  void _onBlocStateChanged(BuildContext context, FoodAnalysisState state) {
     if (state is FoodAnalysisSuccess) {
-      context.read<HistoryCubit>().load();
       _openResult(state.record);
+      // Reset after navigation
+      Future.delayed(const Duration(milliseconds: 300), _removeImage);
+    } else if (state is FoodAnalysisError) {
+      _showErrorWithRetry(state);
     }
   }
 
@@ -341,98 +218,148 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final palette = context.appPalette;
     final textColor = palette.text;
-    final primary = palette.primary;
-    final primaryBg = palette.primaryBg;
     final count = mockRecords.length;
 
-    return BlocListener<FoodAnalysisBloc, FoodAnalysisState>(
-      listener: _onAnalysisStateChanged,
-      child: Scaffold(
-        appBar: const HomeAppBar(),
-        floatingActionButton: AnimatedScale(
-          scale: _showFab ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: FloatingActionButton(
-            onPressed: () {
-              _scrollController.animateTo(
-                0,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeOut,
-              );
-            },
-            child: const Icon(Icons.keyboard_arrow_up),
+    return BlocConsumer<FoodAnalysisBloc, FoodAnalysisState>(
+      listener: _onBlocStateChanged,
+      builder: (context, state) {
+        final isLoading = state is FoodAnalysisLoading;
+
+        return Scaffold(
+          appBar: const HomeAppBar(),
+          floatingActionButton: AnimatedScale(
+            scale: _showFab ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            child: FloatingActionButton(
+              onPressed: _scrollToTop,
+              child: const Icon(Icons.keyboard_arrow_up),
+            ),
           ),
-        ),
-        body: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AnalyzeSection(
-                      onCamera: () => _pickAndAnalyze(ImageSource.camera),
-                      onGallery: () => _pickAndAnalyze(ImageSource.gallery),
-                      onAnalyze: _showSourcePicker,
-                    ),
-                    const SizedBox(height: 28),
-                    Row(
-                      children: [
-                        Text(
-                          'Recent Scans',
-                          style: AppTextStyles.h3.copyWith(color: textColor),
-                        ),
-                        if (count > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: primaryBg,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              '$count',
-                              style: AppTextStyles.caption
-                                  .copyWith(color: primary),
+          body: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Upload Zone Card
+                      UploadZoneCard(
+                        selectedImage: _selectedImage,
+                        isLoading: isLoading,
+                        onCameraTap: () =>
+                            _handleImageSource(ImageSource.camera),
+                        onGalleryTap: () =>
+                            _handleImageSource(ImageSource.gallery),
+                        onRemoveImage: _removeImage,
+                      ),
+                      const SizedBox(height: 14),
+                      // Analyze Button
+                      SizedBox(
+                        height: 52,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed:
+                              _canAnalyze && !isLoading ? _onAnalyzeTap : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: palette.primary,
+                            disabledBackgroundColor:
+                                palette.primary.withValues(alpha: 0.4),
+                            disabledForegroundColor:
+                                Colors.white.withValues(alpha: 0.6),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
                           ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                  ],
-                ),
-              ),
-            ),
-            if (mockRecords.isEmpty)
-              const SliverToBoxAdapter(child: EmptyHistoryState())
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final record = mockRecords[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: FoodHistoryTile(
-                          record: record,
-                          onTap: () => _openResult(record),
+                          child: isLoading
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      'Analyzing...',
+                                      style: AppTextStyles.label
+                                          .copyWith(color: Colors.white),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  'Analyze Food',
+                                  style: AppTextStyles.label
+                                      .copyWith(color: Colors.white),
+                                ),
                         ),
-                      );
-                    },
-                    childCount: mockRecords.length,
+                      ),
+                      const SizedBox(height: 28),
+                      // Recent Scans heading
+                      Row(
+                        children: [
+                          Text(
+                            'Recent Scans',
+                            style: AppTextStyles.h3.copyWith(color: textColor),
+                          ),
+                          if (count > 0) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: palette.primaryBg,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '$count',
+                                style: AppTextStyles.caption
+                                    .copyWith(color: palette.primary),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                    ],
                   ),
                 ),
               ),
-          ],
-        ),
-      ),
+              // History list
+              if (mockRecords.isEmpty)
+                const SliverToBoxAdapter(child: EmptyHistoryState())
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final record = mockRecords[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: FoodHistoryTile(
+                            record: record,
+                            onTap: () => _openResult(record),
+                          ),
+                        );
+                      },
+                      childCount: mockRecords.length,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

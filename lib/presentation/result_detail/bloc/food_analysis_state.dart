@@ -1,6 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 
+enum FoodAnalysisErrorType {
+  noInternet,
+  timeout,
+  invalidResponse,
+  imageProcessing,
+  unknown,
+}
+
 abstract class FoodAnalysisState extends Equatable {
   const FoodAnalysisState();
 
@@ -19,7 +27,7 @@ class FoodAnalysisLoading extends FoodAnalysisState {
 class FoodAnalysisSuccess extends FoodAnalysisState {
   final FoodRecord record;
 
-  const FoodAnalysisSuccess({required this.record});
+  const FoodAnalysisSuccess(this.record);
 
   @override
   List<Object?> get props => [record];
@@ -27,9 +35,13 @@ class FoodAnalysisSuccess extends FoodAnalysisState {
 
 class FoodAnalysisError extends FoodAnalysisState {
   final String message;
+  final FoodAnalysisErrorType errorType;
 
-  const FoodAnalysisError({required this.message});
+  const FoodAnalysisError({
+    required this.message,
+    required this.errorType,
+  });
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, errorType];
 }
