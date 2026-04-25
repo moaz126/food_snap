@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 
 class EmptyHistoryState extends StatelessWidget {
   const EmptyHistoryState({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSub = isDark ? AppColors.darkTextSub : AppColors.lightTextSub;
-    final textMuted =
-        isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
-    final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final palette = context.appPalette;
+    final textSub = palette.textSub;
+    final textMuted = palette.textMuted;
+    final surface = palette.surface;
+    final border = palette.border;
 
     return Container(
       width: double.infinity,

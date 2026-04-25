@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/presentation/home/widgets/upload_zone_card.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_bloc.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_state.dart';
@@ -20,8 +20,8 @@ class AnalyzeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final palette = context.appPalette;
+    final primary = palette.primary;
 
     return BlocBuilder<FoodAnalysisBloc, FoodAnalysisState>(
       builder: (context, state) {

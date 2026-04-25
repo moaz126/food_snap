@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 
 class UploadZoneCard extends StatelessWidget {
   final VoidCallback onCamera;
@@ -16,13 +16,13 @@ class UploadZoneCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-    final primaryBg = isDark ? AppColors.darkPrimaryBg : AppColors.lightPrimaryBg;
-    final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final textSub = isDark ? AppColors.darkTextSub : AppColors.lightTextSub;
+    final palette = context.appPalette;
+    final primary = palette.primary;
+    final primaryBg = palette.primaryBg;
+    final surface = palette.surface;
+    final border = palette.border;
+    final textColor = palette.text;
+    final textSub = palette.textSub;
 
     return Container(
       width: double.infinity,
@@ -91,7 +91,8 @@ class UploadZoneCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: onGallery,
-                    icon: Icon(Icons.photo_library_outlined, size: 18, color: textColor),
+                    icon: Icon(Icons.photo_library_outlined,
+                        size: 18, color: textColor),
                     label: Text('Gallery', style: TextStyle(color: textColor)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),

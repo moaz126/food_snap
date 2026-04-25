@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/core/utils/date_formatter.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 
@@ -18,13 +18,13 @@ class FoodHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-    final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final textSub = isDark ? AppColors.darkTextSub : AppColors.lightTextSub;
-    final textMuted = isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
+    final palette = context.appPalette;
+    final primary = palette.primary;
+    final surface = palette.surface;
+    final border = palette.border;
+    final textColor = palette.text;
+    final textSub = palette.textSub;
+    final textMuted = palette.textMuted;
 
     return GestureDetector(
       onTap: onTap,
@@ -49,7 +49,7 @@ class FoodHistoryTile extends StatelessWidget {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.darkSurface2 : AppColors.lightPrimaryBg,
+                          color: palette.surface2,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -63,7 +63,7 @@ class FoodHistoryTile extends StatelessWidget {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurface2 : AppColors.lightPrimaryBg,
+                        color: palette.surface2,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(

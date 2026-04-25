@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:image_picker/image_picker.dart';
 
 void showSourcePickerSheet(
@@ -14,11 +14,11 @@ void showSourcePickerSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (ctx) {
-      final isDark = Theme.of(ctx).brightness == Brightness.dark;
-      final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-      final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-      final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-      final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+      final palette = ctx.appPalette;
+      final primary = palette.primary;
+      final surface = palette.surface;
+      final textColor = palette.text;
+      final border = palette.border;
 
       return Material(
         color: surface,

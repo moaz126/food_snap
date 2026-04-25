@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:food_snap/core/constants/app_colors.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
+import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/core/theme/theme_cubit.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,8 +14,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-    final textSub = isDark ? AppColors.darkTextSub : AppColors.lightTextSub;
+    final palette = context.appPalette;
+    final primary = palette.primary;
+    final textSub = palette.textSub;
 
     return AppBar(
       toolbarHeight: 68,
