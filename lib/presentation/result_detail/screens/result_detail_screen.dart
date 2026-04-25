@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
 import 'package:food_snap/core/theme/app_palette.dart';
+import 'package:food_snap/core/utils/image_storage_service.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
 import 'package:food_snap/presentation/result_detail/widgets/calories_card.dart';
 import 'package:food_snap/presentation/result_detail/widgets/confidence_badge.dart';
@@ -161,34 +162,37 @@ class _ResultDetailScreenState extends State<ResultDetailScreen> {
   }
 
   Widget _buildFoodImage(FoodRecord record) {
-    final Widget imageWidget;
-    if (record.imageUri.isNotEmpty) {
-      imageWidget = Hero(
-        tag: 'food_image_${record.id}',
-        child: Image.file(
-          File(record.imageUri),
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) =>
-              _buildImagePlaceholder(context.appPalette),
-        ),
-      );
-    } else {
-      imageWidget = Hero(
-        tag: 'food_image_${record.id}',
-        child: _buildImagePlaceholder(context.appPalette),
-      );
-    }
+    return FutureBuilder<bool>(
+      future: ImageStorageService.imageExists(record.imageUri),
+      builder: (context, snapshot) {
+        final exists = snapshot.data ?? false;
+        final imageWidget = exists && record.imageUri.isNotEmpty
+            ? Hero(
+                tag: 'food_image_${record.id}',
+                child: Image.file(
+                  File(record.imageUri),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      _buildImagePlaceholder(context.appPalette),
+                ),
+              )
+            : Hero(
+                tag: 'food_image_${record.id}',
+                child: _buildImagePlaceholder(context.appPalette),
+              );
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        imageWidget,
-        Positioned(
-          bottom: 12,
-          right: 12,
-          child: _buildFullscreenButton(),
-        ),
-      ],
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            imageWidget,
+            Positioned(
+              bottom: 12,
+              right: 12,
+              child: _buildFullscreenButton(),
+            ),
+          ],
+        );
+      },
     );
   }
 

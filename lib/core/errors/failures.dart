@@ -39,3 +39,13 @@ class DatabaseFailure extends Failure {
 class UnknownFailure extends Failure {
   const UnknownFailure({super.message = 'Something went wrong'});
 }
+
+/// Plain exception (not a Failure) — thrown from repository
+/// for database-layer errors so BLoC/Cubit can catch it separately.
+class DatabaseException implements Exception {
+  final String message;
+  const DatabaseException({required this.message});
+
+  @override
+  String toString() => 'DatabaseException: $message';
+}
