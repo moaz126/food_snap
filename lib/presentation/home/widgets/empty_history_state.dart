@@ -16,6 +16,7 @@ class EmptyHistoryState extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(14),

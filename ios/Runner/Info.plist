@@ -27,9 +27,9 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true />
 		<key>NSCameraUsageDescription</key>
-		<string>FoodSnap needs camera to analyze food</string>
+		<string>FoodSnap needs camera access to analyze your food</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>FoodSnap needs photo access to analyze food</string>
+		<string>FoodSnap needs photo access to analyze your food</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
@@ -7,14 +9,18 @@ import 'package:food_snap/presentation/result_detail/bloc/food_analysis_bloc.dar
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_state.dart';
 
 class AnalyzeSection extends StatelessWidget {
-  final VoidCallback onCamera;
-  final VoidCallback onGallery;
+  final File? selectedImage;
+  final VoidCallback onCameraTap;
+  final VoidCallback onGalleryTap;
+  final VoidCallback onRemoveImage;
   final VoidCallback onAnalyze;
 
   const AnalyzeSection({
     super.key,
-    required this.onCamera,
-    required this.onGallery,
+    required this.selectedImage,
+    required this.onCameraTap,
+    required this.onGalleryTap,
+    required this.onRemoveImage,
     required this.onAnalyze,
   });
 
@@ -26,23 +32,27 @@ class AnalyzeSection extends StatelessWidget {
     return BlocBuilder<FoodAnalysisBloc, FoodAnalysisState>(
       builder: (context, state) {
         final isLoading = state is FoodAnalysisLoading;
+        final canAnalyze = selectedImage != null;
 
         return Column(
           children: [
             UploadZoneCard(
-              onCamera: onCamera,
-              onGallery: onGallery,
+              selectedImage: selectedImage,
               isLoading: isLoading,
+              onCameraTap: onCameraTap,
+              onGalleryTap: onGalleryTap,
+              onRemoveImage: onRemoveImage,
             ),
             const SizedBox(height: 14),
             SizedBox(
               height: 52,
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: isLoading ? null : onAnalyze,
+                onPressed: canAnalyze && !isLoading ? onAnalyze : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primary,
-                  disabledBackgroundColor: primary.withValues(alpha: 0.5),
+                  disabledBackgroundColor: primary.withValues(alpha: 0.4),
+                  disabledForegroundColor: Colors.white.withValues(alpha: 0.6),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
