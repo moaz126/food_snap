@@ -194,6 +194,7 @@ as app grows.
 
 - Image compression with 
   flutter_image_compress
+- UI enhancement 
 - Animations — hero transitions, 
   Lottie empty states, micro-interactions
 - CI/CD with GitHub Actions — 
