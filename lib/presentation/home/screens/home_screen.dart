@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_snap/core/constants/app_text_styles.dart';
@@ -9,6 +10,7 @@ import 'package:food_snap/core/theme/app_palette.dart';
 import 'package:food_snap/core/utils/image_picker_service.dart';
 import 'package:food_snap/core/utils/permission_handler_helper.dart';
 import 'package:food_snap/domain/entities/food_record.dart';
+import 'package:food_snap/domain/usecases/delete_all_records.dart';
 import 'package:food_snap/domain/usecases/delete_record.dart';
 import 'package:food_snap/presentation/home/bloc/history_cubit.dart';
 import 'package:food_snap/presentation/home/bloc/history_state.dart';
@@ -79,8 +81,25 @@ class _HomeScreenState extends State<HomeScreen>
     if (!mounted) return;
     if (status == PermissionResult.granted) {
       await _pickImage(source);
+    } else if (status == PermissionResult.limited) {
+      // Treat same as granted — app can still work
+      await _pickImage(source);
     } else if (status == PermissionResult.permanentlyDenied) {
       _showPermissionDialog(source);
+    } else if (status == PermissionResult.restricted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Access restricted by device policy. '
+            'Contact your device administrator.',
+          ),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
     } else {
       _showPermissionSnackbar(source);
     }
@@ -188,13 +207,15 @@ class _HomeScreenState extends State<HomeScreen>
                 child: const Icon(Icons.keyboard_arrow_up),
               ),
             ),
-            body: RefreshIndicator(
-              onRefresh: () => context.read<HistoryCubit>().refresh(),
-              child: ListView(
-                controller: _scrollController,
-                padding: EdgeInsets.zero,
-                children: [
-                  Padding(
+            body: CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: () => context.read<HistoryCubit>().refresh(),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,10 +265,12 @@ class _HomeScreenState extends State<HomeScreen>
                       ],
                     ),
                   ),
-                  // History Content
-                  BlocBuilder<HistoryCubit, HistoryState>(
-                    builder: (context, historyState) {
-                      return switch (historyState) {
+                ),
+                // History Content
+                BlocBuilder<HistoryCubit, HistoryState>(
+                  builder: (context, historyState) {
+                    return SliverToBoxAdapter(
+                      child: switch (historyState) {
                         HistoryLoading() => _buildHistoryLoading(palette),
                         HistoryLoaded(:final records) =>
                           _buildHistoryList(context, records, palette),
@@ -255,12 +278,12 @@ class _HomeScreenState extends State<HomeScreen>
                         HistoryError(:final message) =>
                           _buildHistoryError(context, message, palette),
                         _ => const SizedBox.shrink(),
-                      };
-                    },
-                  ),
-                  const SizedBox(height: 32),
-                ],
-              ),
+                      },
+                    );
+                  },
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+              ],
             ),
           ),
         );
@@ -301,8 +324,61 @@ class _HomeScreenState extends State<HomeScreen>
             return const SizedBox.shrink();
           },
         ),
+        const Spacer(),
+        BlocBuilder<HistoryCubit, HistoryState>(
+          buildWhen: (prev, curr) =>
+              (prev is HistoryLoaded) != (curr is HistoryLoaded),
+          builder: (context, state) {
+            if (state is! HistoryLoaded || state.records.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return TextButton.icon(
+              onPressed: () => _onDeleteAllTap(context),
+              style: TextButton.styleFrom(
+                foregroundColor: palette.coral,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: const Icon(Icons.delete_sweep_outlined, size: 18),
+              label: Text(
+                'Delete All',
+                style: AppTextStyles.caption.copyWith(color: palette.coral),
+              ),
+            );
+          },
+        ),
       ],
     );
+  }
+
+  Future<void> _onDeleteAllTap(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete All Scans?'),
+        content: const Text(
+          'This will permanently remove all your scan history. '
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Delete All',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      context.read<HistoryCubit>().deleteAll(sl<DeleteAllRecords>());
+    }
   }
 
   // MARK: - History State UI Builders

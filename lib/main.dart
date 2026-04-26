@@ -8,6 +8,7 @@ import 'package:food_snap/core/theme/app_theme.dart';
 import 'package:food_snap/core/theme/theme_cubit.dart';
 import 'package:food_snap/presentation/home/bloc/history_cubit.dart';
 import 'package:food_snap/presentation/result_detail/bloc/food_analysis_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   // Preserve splash while app initializes
@@ -19,22 +20,25 @@ Future<void> main() async {
 
   await dotenv.load(fileName: '.env');
   await configureDependencies();
+  final prefs = await SharedPreferences.getInstance();
   await splashTimer;
 
   // Remove splash after init complete
   FlutterNativeSplash.remove();
 
-  runApp(const FoodSnapApp());
+  runApp(FoodSnapApp(prefs: prefs));
 }
 
 class FoodSnapApp extends StatelessWidget {
-  const FoodSnapApp({super.key});
+  final SharedPreferences prefs;
+
+  const FoodSnapApp({super.key, required this.prefs});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<ThemeCubit>()),
+        BlocProvider(create: (_) => ThemeCubit(prefs)),
         BlocProvider(create: (_) => sl<FoodAnalysisBloc>()),
         BlocProvider(create: (_) => sl<HistoryCubit>()),
       ],

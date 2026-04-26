@@ -119,50 +119,47 @@ class FoodRepositoryImpl implements FoodRepository {
   // ── Private helpers ──────────────────────────────
 
   void _validateResult(AiAnalysisResult result) {
-    final normalizedSummary = result.rawSummary.trim().toUpperCase();
-    final normalizedName = result.detectedFoodName.trim().toLowerCase();
-
-    if (normalizedSummary.contains('NO_FOOD_DETECTED') ||
-        _looksLikeNonFoodLabel(normalizedName)) {
-      throw const AiProviderException(
-        message: 'No food detected in this image. Try a clear meal photo.',
-        type: AiProviderErrorType.invalidResponse,
-      );
-    }
-
+    // Check food name
     if (result.detectedFoodName.trim().isEmpty) {
       throw const AiProviderException(
-        message: 'No food detected in this image. Try a clear meal photo.',
+        message: 'Could not identify food in image. '
+            'Try a clearer photo.',
         type: AiProviderErrorType.invalidResponse,
       );
     }
-    if (result.nutrition.calories < 0) {
+
+    // Low confidence — not a food image
+    if (result.confidencePercent <= 5) {
       throw const AiProviderException(
-        message: 'Invalid nutrition data received',
+        message: 'This does not appear to be a food image. '
+            'Please take a photo of food.',
         type: AiProviderErrorType.invalidResponse,
       );
     }
-  }
 
-  bool _looksLikeNonFoodLabel(String value) {
-    if (value.isEmpty) {
-      return false;
+    // All main macros are 0 — clearly wrong response
+    final nutrition = result.nutrition;
+    final allZero = nutrition.calories == 0 &&
+        nutrition.protein == 0 &&
+        nutrition.carbs == 0 &&
+        nutrition.fat == 0;
+
+    if (allZero) {
+      throw const AiProviderException(
+        message: 'Could not analyze nutrition for '
+            'this image. Try a clearer food photo.',
+        type: AiProviderErrorType.invalidResponse,
+      );
     }
 
-    const blockedLabels = {
-      'not food',
-      'non-food',
-      'non food',
-      'no food',
-      'unknown',
-      'scene',
-      'landscape',
-      'object',
-      'person',
-      'animal',
-    };
-
-    return blockedLabels.contains(value);
+    // Unrealistically low calories — any real food has at least 10 kcal
+    if (nutrition.calories > 0 && nutrition.calories < 10) {
+      throw const AiProviderException(
+        message: 'Nutrition data seems incorrect. '
+            'Try a clearer photo.',
+        type: AiProviderErrorType.invalidResponse,
+      );
+    }
   }
 
   FoodRecord _mapToFoodRecord(String imagePath, AiAnalysisResult result) {

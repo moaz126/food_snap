@@ -29,6 +29,7 @@ class AppTheme {
         backgroundColor: AppColors.lightSurface,
         foregroundColor: AppColors.lightText,
         elevation: 0,
+        scrolledUnderElevation: 0,
         titleTextStyle: AppTextStyles.h3.copyWith(color: AppColors.lightText),
       ),
       cardTheme: CardThemeData(
@@ -78,6 +79,7 @@ class AppTheme {
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkText,
         elevation: 0,
+        scrolledUnderElevation: 0,
         titleTextStyle: AppTextStyles.h3.copyWith(color: AppColors.darkText),
       ),
       cardTheme: CardThemeData(

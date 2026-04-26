@@ -10,6 +10,6 @@ final sl = GetIt.instance;
   asExtension: false,
 )
 Future<void> configureDependencies() async {
-  initGetIt(sl);
+  await initGetIt(sl);
   await sl<DatabaseHelper>().init();
 }

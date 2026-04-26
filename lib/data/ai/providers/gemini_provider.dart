@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -23,25 +22,32 @@ class GeminiProvider implements AiProvider {
   static const String _systemPrompt = '''
 You are a nutrition analysis expert.
 Analyze the food image and respond ONLY with 
-valid JSON. No markdown. No extra text. 
+valid JSON. No markdown. No extra text.
 No explanations. No code blocks.
-If the image does not contain food, return valid JSON with:
-- detectedFoodName as an empty string
-- cuisineTags as an empty array
-- confidencePercent as 0
-- all nutrition values as 0
-- rawSummary as "NO_FOOD_DETECTED"
+
+IMPORTANT RULES:
+- If you cannot identify the food clearly, 
+  still make your best estimate
+- NEVER return 0 for calories, protein, 
+  carbs, or fat — always estimate realistically
+- Minimum calories for any real food: 10 kcal
+- If image is not food at all, set 
+  confidencePercent to 5 or below
+- All numeric values must be positive numbers
+- Estimate based on typical serving size 
+  if not clear from image
 
 JSON structure:
 {
   "detectedFoodName": "string",
   "cuisineTags": ["string"],
-  "confidencePercent": number,
+  "confidencePercent": number (0-100),
   "nutrition": {
-    "calories": number,
-    "protein": number,
-    "carbs": number,
-    "fat": number,
+    "calories": number (never 0),
+    "protein": number (never 0),
+    "carbs": number (can be 0 only for 
+              pure protein/fat foods),
+    "fat": number (never 0),
     "fiber": number,
     "sugar": number,
     "sodium": number,
