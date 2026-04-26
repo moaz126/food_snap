@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:food_snap/data/ai/models/ai_analysis_result.dart';
 
-/// SOLID: Interface Segregation + Dependency Inversion
-/// All AI providers MUST implement this contract.
 /// Repository depends on this — never on concrete class.
 abstract class AiProvider {
   /// Unique name of this provider (for logging/debug)
