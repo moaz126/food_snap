@@ -7,13 +7,11 @@
 
 ## 📱 Screenshots
 
+## 📱 Screenshots
+
 | Home – Light | Home – Dark | Detail – Light | Detail – Dark |
 |---|---|---|---|
-| ![](<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-04-26 at 15 19 36" src="https://github.com/user-attachments/assets/c6103ff9-28ad-47a2-81c9-534454cfc8c6" />
-) | ![](<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-04-26 at 15 19 39" src="https://github.com/user-attachments/assets/b25cfd86-773f-40a0-88f1-999ceaa8707e" />
-) | ![](<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-04-26 at 15 19 59" src="https://github.com/user-attachments/assets/cc62f7b3-cba7-45c1-b2a4-914f57376db2" />
-) | ![](<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 17 - 2026-04-26 at 15 19 49" src="https://github.com/user-attachments/assets/5c4c286e-7b72-47b7-b427-f8317c3cd87b" />
-) |
+| <img src="https://github.com/user-attachments/assets/c6103ff9-28ad-47a2-81c9-534454cfc8c6" width="200"/> | <img src="https://github.com/user-attachments/assets/b25cfd86-773f40a0-88f1-999ceaa8707e" width="200"/> | <img src="https://github.com/user-attachments/assets/cc62f7b3-cba7-45c1-b2a4-914f57376db2" width="200"/> | <img src="https://github.com/user-attachments/assets/5c4c286e-7b72-47b7-b427-f8317c3cd87b" width="200"/> |
 
 ---
 
