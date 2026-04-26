@@ -13,10 +13,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final palette = context.appPalette;
     final primary = palette.primary;
     final textSub = palette.textSub;
+
+    final themeCubit = context.watch<ThemeCubit>();
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final isDark = themeCubit.state == ThemeMode.dark ||
+        (themeCubit.state == ThemeMode.system && brightness == Brightness.dark);
 
     return AppBar(
       toolbarHeight: 68,
@@ -44,7 +48,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-          onPressed: () => context.read<ThemeCubit>().toggle(),
+          onPressed: () => context.read<ThemeCubit>().toggle(context),
           icon: SvgPicture.asset(
             isDark ? 'assets/icons/sun.svg' : 'assets/icons/moon.svg',
             width: 24,
