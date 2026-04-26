@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:food_snap/core/constants/app_colors.dart';
 
 class FullScreenImageViewer extends StatelessWidget {
   final String imageUri;
@@ -58,7 +59,7 @@ class FullScreenImageViewer extends StatelessWidget {
   Widget _buildImage() {
     if (imageUri.isEmpty) {
       return Container(
-        color: Colors.grey[800],
+        color: AppColors.darkSurface2,
         child: const Icon(Icons.restaurant, size: 80, color: Colors.white54),
       );
     }
@@ -68,7 +69,7 @@ class FullScreenImageViewer extends StatelessWidget {
         File(imageUri),
         fit: BoxFit.contain,
         errorBuilder: (_, __, ___) => Container(
-          color: Colors.grey[800],
+          color: AppColors.darkSurface2,
           child: const Icon(
             Icons.image_not_supported,
             size: 80,
@@ -78,7 +79,7 @@ class FullScreenImageViewer extends StatelessWidget {
       );
     } catch (_) {
       return Container(
-        color: Colors.grey[800],
+        color: AppColors.darkSurface2,
         child: const Icon(
           Icons.image_not_supported,
           size: 80,

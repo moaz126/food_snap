@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _onDeleteAllTap(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Delete All Scans?'),
         content: const Text(
           'This will permanently remove all your scan history. '
@@ -368,9 +368,9 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
+            child: Text(
               'Delete All',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: ctx.appPalette.coral),
             ),
           ),
         ],
@@ -465,27 +465,15 @@ class _HomeScreenState extends State<HomeScreen>
         children: records.map((record) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Dismissible(
+            child: _SlidableHistoryTile(
               key: Key(record.id),
-              direction: DismissDirection.endToStart,
-              background: Container(
-                decoration: BoxDecoration(
-                  color: palette.coral,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 20),
-                child: const Icon(Icons.delete_outline, color: Colors.white),
-              ),
-              onDismissed: (_) {
+              record: record,
+              onTap: () => _openResult(record),
+              onDeleteConfirmed: () {
                 context
                     .read<HistoryCubit>()
                     .deleteRecord(record.id, sl<DeleteRecord>());
               },
-              child: FoodHistoryTile(
-                record: record,
-                onTap: () => _openResult(record),
-              ),
             ),
           );
         }).toList(),
@@ -684,5 +672,146 @@ class _HomeScreenState extends State<HomeScreen>
       }
       messenger.hideCurrentSnackBar();
     });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// _SlidableHistoryTile
+// Partial swipe reveals delete button; tap delete → confirm dialog
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SlidableHistoryTile extends StatefulWidget {
+  final FoodRecord record;
+  final VoidCallback onTap;
+  final VoidCallback onDeleteConfirmed;
+
+  const _SlidableHistoryTile({
+    super.key,
+    required this.record,
+    required this.onTap,
+    required this.onDeleteConfirmed,
+  });
+
+  @override
+  State<_SlidableHistoryTile> createState() => _SlidableHistoryTileState();
+}
+
+class _SlidableHistoryTileState extends State<_SlidableHistoryTile>
+    with SingleTickerProviderStateMixin {
+  static const double _actionWidth = 72.0;
+
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+      lowerBound: 0,
+      upperBound: _actionWidth,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onHorizontalDragUpdate(DragUpdateDetails details) {
+    _controller.value =
+        (_controller.value - details.delta.dx).clamp(0.0, _actionWidth);
+  }
+
+  void _onHorizontalDragEnd(DragEndDetails details) {
+    if (_controller.value > _actionWidth * 0.4) {
+      _controller.animateTo(_actionWidth, curve: Curves.easeOut);
+    } else {
+      _controller.animateTo(0, curve: Curves.easeOut);
+    }
+  }
+
+  void _close() {
+    _controller.animateTo(0, curve: Curves.easeOut);
+  }
+
+  Future<void> _onDeleteTap() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Scan?'),
+        content: const Text('This scan will be permanently removed.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: ctx.appPalette.coral),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (confirmed == true) {
+      widget.onDeleteConfirmed();
+    } else {
+      _close();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Stack(
+            children: [
+              // Delete action background
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: _onDeleteTap,
+                    child: Container(
+                      width: _actionWidth,
+                      color: palette.coral,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Tile slides left
+              Transform.translate(
+                offset: Offset(-_controller.value, 0),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                  onHorizontalDragEnd: _onHorizontalDragEnd,
+                  onTap: _controller.value > 1 ? _close : widget.onTap,
+                  child: FoodHistoryTile(
+                    record: widget.record,
+                    onTap: _controller.value > 1 ? _close : widget.onTap,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

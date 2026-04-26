@@ -21,15 +21,15 @@ class ConfidenceBadge extends StatelessWidget {
     if (percent >= 90) {
       bgColor = palette.greenBg;
       textColor = palette.green;
-      icon = Icons.check_circle;
+      icon = Icons.check_circle_rounded;
     } else if (percent >= 70) {
       bgColor = palette.amberBg;
       textColor = palette.amber;
-      icon = Icons.info;
+      icon = Icons.info_rounded;
     } else {
       bgColor = palette.coralBg;
       textColor = palette.coral;
-      icon = Icons.info;
+      icon = Icons.warning_rounded;
     }
 
     return Container(

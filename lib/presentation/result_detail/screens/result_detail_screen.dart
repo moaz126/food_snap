@@ -44,6 +44,13 @@ class _ResultDetailScreenState extends State<ResultDetailScreen> {
     _scrollController = ScrollController()..addListener(_handleScroll);
   }
 
+  String _formatNumber(double value) {
+    if (value == value.truncate()) {
+      return value.toInt().toString();
+    }
+    return value.toString();
+  }
+
   void _handleScroll() {
     final shouldCollapse = _scrollController.offset > _collapseOffset;
     if (shouldCollapse != _isCollapsed) {
@@ -259,7 +266,10 @@ class _ResultDetailScreenState extends State<ResultDetailScreen> {
   }
 
   Widget _buildCaloriesSection(FoodRecord record) {
-    return CaloriesCard(calories: record.nutrition.calories);
+    return CaloriesCard(
+      calories: record.nutrition.calories,
+      servingSize: record.nutrition.servingSize,
+    );
   }
 
   Widget _buildMacrosSection(FoodRecord record, AppPalette palette) {
@@ -294,6 +304,7 @@ class _ResultDetailScreenState extends State<ResultDetailScreen> {
                 unit: 'g',
                 color: palette.amber,
                 bgColor: palette.amberBg,
+                maxReference: 300,
               ),
             ),
             const SizedBox(width: 10),
@@ -318,19 +329,19 @@ class _ResultDetailScreenState extends State<ResultDetailScreen> {
     if (record.nutrition.fiber != null) {
       rows.add(NutritionDetailRow(
         title: 'Fiber',
-        value: '${record.nutrition.fiber!.toStringAsFixed(1)}g',
+        value: '${_formatNumber(record.nutrition.fiber!)}g',
       ));
     }
     if (record.nutrition.sugar != null) {
       rows.add(NutritionDetailRow(
         title: 'Sugar',
-        value: '${record.nutrition.sugar!.toStringAsFixed(1)}g',
+        value: '${_formatNumber(record.nutrition.sugar!)}g',
       ));
     }
     if (record.nutrition.sodium != null) {
       rows.add(NutritionDetailRow(
         title: 'Sodium',
-        value: '${record.nutrition.sodium!.toStringAsFixed(1)}mg',
+        value: '${_formatNumber(record.nutrition.sodium!)}mg',
       ));
     }
     if (record.nutrition.servingSize != null) {
