@@ -1,7 +1,7 @@
 flutter_native_splash:
-  # Background color — white (both modes)
+  # Background color — white (light) / dark navy (dark)
   color: "#FFFFFF"
-  color_dark: "#FFFFFF"
+  color_dark: "#0D1117"
 
   # App icon as splash image
   image: assets/icons/app_icon.png
@@ -14,9 +14,9 @@ flutter_native_splash:
   android_12:
     image: assets/icons/app_icon.png
     icon_background_color: "#FFFFFF"
-    icon_background_color_dark: "#FFFFFF"
+    icon_background_color_dark: "#0D1117"
     color: "#FFFFFF"
-    color_dark: "#FFFFFF"
+    color_dark: "#0D1117"
 
   # Disable web (not needed)
   web: false

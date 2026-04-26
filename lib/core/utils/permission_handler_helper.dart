@@ -2,8 +2,10 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 
 enum PermissionResult {
   granted,
+  limited, // iOS 14+ partial photo access
   denied,
   permanentlyDenied,
+  restricted, // iOS parental controls / MDM
 }
 
 class PermissionHandlerHelper {
@@ -18,6 +20,8 @@ class PermissionHandlerHelper {
       return PermissionResult.granted;
     } else if (status.isPermanentlyDenied) {
       return PermissionResult.permanentlyDenied;
+    } else if (status.isRestricted) {
+      return PermissionResult.restricted;
     } else {
       return PermissionResult.denied;
     }
@@ -30,10 +34,14 @@ class PermissionHandlerHelper {
   static Future<PermissionResult> requestPhotos() async {
     final status = await ph.Permission.photos.request();
 
-    if (status.isGranted || status.isLimited) {
+    if (status.isGranted) {
       return PermissionResult.granted;
+    } else if (status.isLimited) {
+      return PermissionResult.limited;
     } else if (status.isPermanentlyDenied) {
       return PermissionResult.permanentlyDenied;
+    } else if (status.isRestricted) {
+      return PermissionResult.restricted;
     } else {
       return PermissionResult.denied;
     }

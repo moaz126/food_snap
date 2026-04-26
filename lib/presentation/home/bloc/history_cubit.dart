@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_snap/core/errors/failures.dart';
+import 'package:food_snap/domain/usecases/delete_all_records.dart';
 import 'package:food_snap/domain/usecases/delete_record.dart';
 import 'package:food_snap/domain/usecases/get_all_records.dart';
 import 'package:food_snap/presentation/home/bloc/history_state.dart';
@@ -54,6 +55,17 @@ class HistoryCubit extends Cubit<HistoryState> {
       await refresh();
     } catch (e) {
       emit(const HistoryError(message: 'Failed to delete record.'));
+    }
+  }
+
+  Future<void> deleteAll(DeleteAllRecords deleteAllRecordsUseCase) async {
+    try {
+      await deleteAllRecordsUseCase();
+      emit(const HistoryEmpty());
+    } on DatabaseException catch (e) {
+      emit(HistoryError(message: e.message));
+    } catch (e) {
+      emit(const HistoryError(message: 'Failed to clear history.'));
     }
   }
 }
