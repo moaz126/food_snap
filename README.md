@@ -160,25 +160,30 @@ persistence across app restarts.
 ## ⚖️ Trade-offs & Decisions
 
 **BLoC over Riverpod/Provider**
+
 Explicit event→state flow makes async 
 operations like API calls easy to trace 
 and test.
 
 **sqflite over Hive/Isar**
+
 Structured relational data fits SQL 
 naturally. No code generation required.
 
 **go_router over Navigator 2.0**
+
 Declarative routing with type-safe 
 extras. Deep link support ready out of 
 the box.
 
 **Direct HTTP over SDK packages**
+
 All AI providers use raw http calls — 
 consistent pattern, full control, 
 no extra packages.
 
 **Feature-first over Layer-first**
+
 Each feature folder is self-contained. 
 Easy to add, remove, or move features 
 as app grows.
