@@ -202,6 +202,8 @@ as app grows.
 - Pagination for large history lists
 - Offline queue for failed API calls
 - Theme control on Splash Screen
+- Crash reporting with Firebase Crashlytics 
+  or Sentry for production error monitoring
 
 ---
 
