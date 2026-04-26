@@ -95,7 +95,10 @@ flutter pub get
 cp .env.example .env
 # Add your API key to .env
 
-# 4. Run
+# 4. Generate dependency injection code
+dart run build_runner build --delete-conflicting-outputs
+
+# 5. Run
 flutter run
 ```
 
