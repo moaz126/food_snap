@@ -4,15 +4,19 @@ flutter_native_splash:
   color_dark: "#0D1117"
 
   # App icon as splash image
-  image: assets/icons/app_icon.png
-  image_dark: assets/icons/app_icon.png
+  image: assets/icons/splash_icon.png
+  image_dark: assets/icons/splash_icon.png
+
+  # Keep image centered so it does not stretch across full width
+  android_gravity: center
+  ios_content_mode: center
 
   # Image size — 30% of screen
   fullscreen: false
 
   # Android 12+ specific
   android_12:
-    image: assets/icons/app_icon.png
+    image: assets/icons/splash_icon.png
     icon_background_color: "#FFFFFF"
     icon_background_color_dark: "#0D1117"
     color: "#FFFFFF"
