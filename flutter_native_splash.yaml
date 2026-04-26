@@ -1,0 +1,22 @@
+flutter_native_splash:
+  # Background color — white (both modes)
+  color: "#FFFFFF"
+  color_dark: "#FFFFFF"
+
+  # App icon as splash image
+  image: assets/icons/app_icon.png
+  image_dark: assets/icons/app_icon.png
+
+  # Image size — 30% of screen
+  fullscreen: false
+
+  # Android 12+ specific
+  android_12:
+    image: assets/icons/app_icon.png
+    icon_background_color: "#FFFFFF"
+    icon_background_color_dark: "#FFFFFF"
+    color: "#FFFFFF"
+    color_dark: "#FFFFFF"
+
+  # Disable web (not needed)
+  web: false
